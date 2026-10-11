@@ -1,0 +1,14 @@
+node_modules/
+*.sqlite*
+*.dpapi
+.env*
+*.log
+.runtime/
+dist/
+exports/
+*.zip
+*.pem
+*.key
+*.pfx
+*.p12
+*.bak

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070908">
+  <meta name="description" content="Személyes X munkatér: analitika, kapcsolatok, válaszok és tartalomtervezés helyben.">
+  <title>autoX · Személyes munkatér</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/errors-i18n.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="Ugrás a tartalomhoz">Ugrás a tartalomhoz</a>
+  <aside class="sidebar">
+    <a class="maker-credit" href="https://benkany.com" target="_blank" rel="noopener noreferrer">made by benkany.com</a>
+    <a class="brand" href="#overview" aria-label="autoX kezdőlap" data-i18n-aria="autoX kezdőlap"><span class="brand-mark">X</span><span>autoX</span></a>
+    <div class="workspace-label"><span data-i18n="SZEMÉLYES MUNKATÉR">SZEMÉLYES MUNKATÉR</span> <span class="live-dot"></span></div>
+    <nav id="nav" aria-label="Fő navigáció" data-i18n-aria="Fő navigáció"></nav>
+    <div class="sidebar-bottom"><span class="local-badge">◉ <span data-i18n="Helyben, a saját gépeden">Helyben, a saját gépeden</span></span><button id="stop" class="quiet danger">⏸ Automatizálás szüneteltetése</button><div id="account" class="account"></div></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div class="breadcrumb"><span data-i18n="Munkatér">Munkatér</span> <span>/</span> <span id="breadcrumb">Áttekintés</span></div><div class="top-actions"><span id="connection" class="badge">Helyi mód</span><button id="refresh" class="quiet" title="Helyi adatok újraolvasása" data-i18n-title="Helyi adatok újraolvasása">↻ <span data-i18n="Frissítés">Frissítés</span></button><button class="primary small" data-nav="queue">＋ <span data-i18n="Új bejegyzés">Új bejegyzés</span></button></div></header>
+    <main id="main" tabindex="-1"><div class="loading" role="status" data-i18n="Munkatér betöltése…">Munkatér betöltése…</div></main>
+    <footer class="app-footer"><span>autoX <span class="muted">/ <span data-i18n="privát béta">privát béta</span></span></span><a id="guide-link" href="/guide.html" target="_blank" rel="noopener noreferrer"><span data-i18n="Használati útmutató">Használati útmutató</span> ↗</a><span data-i18n="Te döntesz minden küldésről.">Te döntesz minden küldésről.</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

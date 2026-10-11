@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>autoX – Használati útmutató</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#070908;color:#eee;font:16px/1.7 system-ui,sans-serif}main{max-width:880px;margin:auto;padding:40px 24px 80px}h1{font-size:42px;line-height:1.15}h2{margin-top:44px;color:#2dff7d}h3{margin-top:28px}a{color:#2dff7d}code{background:#26232c;padding:2px 6px;border-radius:4px;overflow-wrap:anywhere}li{margin:8px 0}.notice{padding:18px 22px;border:1px solid #735331;border-radius:12px;background:#292015}table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid #39353f}small{color:#bdb6c5}nav{display:flex;flex-wrap:wrap;gap:10px 22px}@media(max-width:560px){main{padding:24px 16px}h1{font-size:32px}th,td{padding:8px;font-size:13px}}@media print{:root{color-scheme:light}body{background:white;color:black}main{padding:0}h2,a{color:#713452}.notice,code{background:#eee}nav{display:none}}
+</style>
+</head>
+<body><main>
+<small>SAJÁT GÉPEN FUTÓ X-MUNKATÉR · BÉTA</small>
+<p aria-label="Útmutató nyelve"><a href="guide.html" lang="hu" hreflang="hu" aria-current="page">Magyar</a> · <a href="guide.en.html" lang="en" hreflang="en">English</a></p>
+<h1>autoX<br>Használati útmutató</h1>
+<p>Indítsd az asztali <strong>autoX</strong> parancsikonnal. A program címe: <a href="http://127.0.0.1:4317/">http://127.0.0.1:4317/</a>. Ez az útmutató fájlként, internet nélkül is megnyitható.</p>
+<nav><a href="#start">Első használat</a><a href="#pages">Funkciók</a><a href="#sending">Küldés</a><a href="#settings">Beállítások</a><a href="#errors">Hibák</a><a href="#data">Mentés</a></nav>
+
+<h2 id="start">1. Első használat</h2>
+<ol>
+<li><strong>Indítás:</strong> dupla kattintás az asztali autoX ikonra. Ha már fut, ugyanazt a helyi programot nyitja meg.</li>
+<li><strong>X-belépés:</strong> Beállítások → X-fiók csatlakoztatása → engedélyezés az X-en. A jelszavadat az X saját oldalán adod meg. A visszatérés után a saját profilodnak kell megjelennie.</li>
+<li><strong>Adatok betöltése:</strong> az Áttekintésen indíts X-szinkronizálást. Ez X API-kéréseket indít, amelyekhez megfelelő jogosultság és felhasználható API-keret kell.</li>
+<li><strong>Értelmezd az állapotot:</strong> a „Csatlakoztatva” hozzáférési token jelenlétét jelzi. A sikeres szinkron külön feltétel; a felület megmutatja annak hibáját is.</li>
+<li><strong>AI csak ha szeretnéd:</strong> a Beállításokban add meg az OpenAI API-kulcsot, majd mentsd. A többi helyi funkcióhoz nem kell OpenAI-kulcs.</li>
+</ol>
+<div class="notice"><strong>Kizárólag kézi szinkron.</strong> Minden felhasználó saját API-kulcsokat ad meg. Az alkalmazás megnyitása mentett helyi adatokat olvas. A szinkron külön jóváhagyást kér, és több fizetős API-kérést indíthat. A követőváltozások mérése az első teljes pillanatképtől indul.</div>
+
+<h2>2. X-belépés egyszeri beállítása</h2>
+<p>Ha már beléptél, ezeket nem kell minden indításkor újra megadnod.</p>
+<ol>
+<li>Nyisd meg az <a href="https://console.x.com/" target="_blank" rel="noopener noreferrer">X Developer Console</a> saját alkalmazását, és engedélyezd az OAuth 2.0 felhasználói hitelesítést.</li>
+<li>A callback / redirect cím pontosan: <code>http://127.0.0.1:4317/oauth/callback</code>.</li>
+<li>Az autoX Beállításokban az <strong>OAuth Client ID</strong> mezőbe az OAuth 2.0 Client ID-t írd. Ha az alkalmazásodhoz Client Secret is tartozik, töltsd ki azt is.</li>
+<li>Mentsd a kapcsolati beállításokat, majd válaszd az <strong>X-fiók csatlakoztatása</strong> gombot.</li>
+</ol>
+<p>A Consumer Key és az alkalmazásszintű Bearer Token nem helyettesíti ezt a belépést. A felhasználói Access Token mező haladó alternatíva; normál használatnál üresen hagyható. A titkos mezők mentés után üresek maradnak: a program nem olvassa vissza a kulcsot a böngészőnek. Üres mező mentése megtartja a korábbi kulcsot.</p>
+<p>Az alkalmazás egy X-fiók munkaterét kezeli. Másik fiókot ne csatlakoztass ugyanahhoz az adatkönyvtárhoz. A kért jogosultságok: <code>tweet.read tweet.write users.read follows.read follows.write media.write offline.access</code>. A tényleges végpont-hozzáférést az X határozza meg.</p>
+
+<h2 id="pages">3. Melyik oldalt mire használd?</h2>
+<table><thead><tr><th>Oldal</th><th>Használat</th></tr></thead><tbody>
+<tr><td>Áttekintés</td><td>Fő mutatók és legjobb posztok. Innen indítható az X-adatok szinkronizálása. A felső „Frissítés” csak a helyben már mentett adatokat olvassa újra.</td></tr>
+<tr><td>Analitika</td><td>Válassz 7, 14 vagy 28 napos időszakot, és rendezd a posztokat elérés vagy interakció alapján. A „—” azt jelenti, hogy nincs elérhető adat, nem azt, hogy nulla.</td></tr>
+<tr><td>Követők</td><td>Követők, követett fiókok, vissza nem követők és változásnapló. A lista teljes, sikeres szinkronokból épül.</td></tr>
+<tr><td>Válaszok</td><td>Elérhető említések és neked címzett válaszok. Írhatsz piszkozatot, kérhetsz AI-javaslatot, és a választ a Küldési sorba teheted.</td></tr>
+<tr><td>Engage</td><td>X-keresés, nyelvi és egyéb szűrők, mentett keresések. A találatokból inspiráció, lead vagy válaszpiszkozat készülhet. Minden keresés API-kérést használ.</td></tr>
+<tr><td>Studio</td><td>Saját szöveg és AI-piszkozatok. Adj konkrét témát, célt és hangnemet; szerkeszd az eredményt, majd mentsd vagy tedd a Küldési sorba.</td></tr>
+<tr><td>Küldési sor</td><td>Posztok és válaszok piszkozatként mentése, képek csatolása, kézi küldés és jóváhagyott időzítés. DM-tervezethez az X felülete használható.</td></tr>
+<tr><td>Minták</td><td>Saját vagy megadott fiók elérhető posztjainak vizsgálata, AI-összefoglaló és mentés. Az elemzés a kapott mintából dolgozik.</td></tr>
+<tr><td>Leadlista</td><td>Kézzel kezelt kapcsolatok, jegyzetek és státuszok. Nem automatikus ügyfélszerző bot.</td></tr>
+<tr><td>Beállítások</td><td>X-kapcsolat, OpenAI, stílus, célok, napi íráskorlát, kézi szinkron és szüneteltetés.</td></tr>
+<tr><td>Export és MCP</td><td>JSON/CSV export és olvasási MCP-csatlakozás a már mentett helyi adatokhoz.</td></tr>
+</tbody></table>
+
+<h3>A követőnapló értelmezése</h3>
+<p>Az első sikeres teljes lekérés alapállapotot készít. Korábbi kikövetéseket nem lehet ebből visszaállítani. Egy korábbi követő eltűnését két egymást követő, különböző időpontú teljes lekérésnek kell megerősítenie. Az esemény ideje az észlelés ideje. A hiányos vagy hibás lekérés nem bizonyít kikövetést.</p>
+<h3>Az analitika értelmezése</h3>
+<p>A program a posztok jelenlegi, API-ból elérhető számait a poszt közzétételének UTC-napja szerint csoportosítja. A grafikon nem azt mutatja, melyik napon történt a megtekintés. A rangsor a betöltött posztokra és a választott időszakra vonatkozik; nem garantált teljes fióktörténet.</p>
+
+<h2 id="sending">4. Poszt, válasz, kép és időzítés</h2>
+<ol>
+<li>A Küldési sorban válassz típust és írd meg a szöveget. Válasznál a célposzt számból álló azonosítója szükséges: az X-link <code>/status/</code> utáni száma. Az Inboxból vagy Engage-ből indított válasz ezt kitölti.</li>
+<li>Először <strong>piszkozatként</strong> ments. A piszkozat mentése nem küld posztot az X-re.</li>
+<li>Képet külön feltöltéssel csatolhatsz: legfeljebb 4 PNG/JPEG/WebP, egyenként legfeljebb 5 MB. A feltöltés már élő X-művelet, külön megerősítéssel. Hosszabb ideje feltöltött kép médiaazonosítója lejárhat; ilyen hibánál töltsd fel újra a képet.</li>
+<li>Kézi küldésnél ellenőrizd a szöveget és célpontot, majd hagyd jóvá a küldést.</li>
+<li>Időzítésnél a géped helyi időzónája szerinti jövőbeli időt válassz, és hagyd jóvá. A gép és az autoX háttérfolyamata maradjon bekapcsolva; az alvó gép nem küld.</li>
+</ol>
+<p><strong>Szüneteltetett állapotban az élő küldés, follow/unfollow és képfeltöltés is blokkolt.</strong> A folytatás a már jóváhagyott, esedékes időzítéseket is elindíthatja, ezért előtte nézd át a sort. A kézi olvasási szinkron szüneteltetve is használható.</p>
+<p>Ha több mint 15 percet késett egy időzítés, a program visszateszi piszkozatba ellenőrzésre. „Bizonytalan” állapotnál először az X-en nézd meg, megjelent-e a poszt; a program nem ismétli meg automatikusan. A „Megjelölés elküldöttnek” csak helyi állapotmódosítás, nem küld semmit.</p>
+<p>A DM-eket az X oldalán küldöd el. Az autoX nem olvassa a privát üzeneteidet. Az AI által írt szöveg sem kerül ki magától: ellenőrizhető piszkozat lesz.</p>
+
+<h2 id="settings">5. Beállítások és költségek</h2>
+<p>A Beállítások → Nyelv mezőben válassz <strong>Magyar</strong> vagy <strong>English</strong> nyelvet. A felület azonnal átvált, és újratöltés után is megőrzi a választást.</p>
+<ul>
+<li><strong>Csak kézi X-szinkron:</strong> nincs automatikus adatfrissítés. A Szinkron gomb külön költségjóváhagyást kér. Egy teljes frissítés több tucat lapozott API-kérést indíthat. Az oldal újratöltése és a felső Frissítés gomb csak a mentett helyi adatokat olvassa.</li>
+<li><strong>Napi API-küldési korlát:</strong> alapból 20 írási kísérlet, UTC-naponként. A poszt, reply, képfeltöltés és follow/unfollow is beleszámít; sikertelen kísérlet is fogyaszthatja. Ez nem pénzügyi költési plafon, és az olvasásokat nem korlátozza.</li>
+<li><strong>Eléréscél:</strong> csak kijelzett célérték, nem automatikus posztolási utasítás.</li>
+<li><strong>OpenAI:</strong> saját API-kulcs és hozzáférhető modell kell. Az alapmodell <code>gpt-4.1-mini</code>. A ChatGPT-előfizetés önmagában nem helyettesíti az API-kulcsot és az API-keretet.</li>
+<li><strong>Automatizálás:</strong> csak a jóváhagyott időzített küldést vezérli. Önálló AI-válaszbot, automatikus follow/unfollow nincs bekapcsolva.</li>
+</ul>
+
+<h2 id="errors">6. Gyakori hibák</h2>
+<table><thead><tr><th>Hiba</th><th>Teendő</th></tr></thead><tbody>
+<tr><td>HTTP 402 / API credits</td><td>Az X Developer Console saját projektjében ellenőrizd az API-egyenleget, számlázást és költési korlátokat. Az X Premium előfizetés nem igazolja az API-kredit meglétét. A belépés ettől még működhet. A keret rendezése után indíts egy kézi szinkront.</td></tr>
+<tr><td>HTTP 401</td><td>A token érvénytelen vagy lejárt. Próbáld újra az X-fiók csatlakoztatását. Ha szükséges, ellenőrizd az OAuth-alkalmazás beállításait.</td></tr>
+<tr><td>HTTP 403</td><td>Jogosultsági vagy végpont-hozzáférési akadály lehet. Ellenőrizd az X-alkalmazás engedélyeit; megváltozott jogosultságok után új belépés kellhet.</td></tr>
+<tr><td>HTTP 429</td><td>Várj az API-korlát feloldására. Ne indíts ismételt szinkronokat egymás után.</td></tr>
+<tr><td>Hibás vagy lejárt X-belépés</td><td>Az autoX gombjával kezdd újra. Korábbi engedélyezési link ne legyen könyvjelző: rövid életű állapotot tartalmaz.</td></tr>
+<tr><td>Másik X-fiók</td><td>Az eredeti fiókkal lépj be újra. Másik fiókhoz külön helyi adatkönyvtár szükséges; a program nem keveri a két fiók adatait.</td></tr>
+<tr><td>Üres analitika vagy követőlista</td><td>Nézd meg, sikerült-e az adott rész szinkronja. Üres helyi lista hibás szinkron után nem bizonyítja, hogy nincs posztod vagy követőd.</td></tr>
+<tr><td>„Frissítsd az oldalt a művelethez”</td><td>A szerver újraindult, és a böngészőben régi munkamenet van. Töltsd újra az oldalt. Előtte másold ki a még nem mentett szövegedet.</td></tr>
+<tr><td>Nem indul a program</td><td>Indítsd az asztali autoX parancsikont. Node.js 24 vagy újabb kell. A naplókat az alábbi adatmappában találod.</td></tr>
+</tbody></table>
+
+<h2 id="data">7. Mentés, adatvédelem és leállítás</h2>
+<p>Adatmappa: <code>%LOCALAPPDATA%\Xauto</code>. A <code>workspace.sqlite</code> a munkatér; a <code>credentials.dpapi</code> a Windows-felhasználóhoz kötötten titkosított kulcstár. A naplók: <code>server.log</code> és <code>server-error.log</code>. Titkos kulcsokat ne tegyél képernyőképbe, chatbe vagy nyilvános megosztásba.</p>
+<p>Mentéshez használd az <strong>Export és MCP → JSON-export</strong> lehetőséget. A CSV posztadatokat ad. Az export nem tartalmaz kapcsolati kulcsokat. Automatikus JSON-import nincs a bétában. Teljes fájlmentéshez állítsd le a programot, és mentsd az egész adatmappát; másik Windows-felhasználóval a titkosított kulcstár nem feltétlenül olvasható.</p>
+<p>A böngésző bezárása nem állítja le a kiszolgálót. A Szüneteltetés megállítja a következő automatikus műveleteket; egy már elindított kérés nem vonható vissza. A gép leállítása leállítja a programot. Feladatkezelőben csak a autoX-hoz tartozó Node-folyamatot állítsd le, más Node-programot ne.</p>
+<p>A helyi adatok a gépeden maradnak. X-szinkron, küldés és keresés az X API-val kommunikál; AI-kéréskor a kiválasztott szövegkörnyezet az OpenAI API-hoz kerül. A program csak a <code>127.0.0.1</code> helyi címen figyel.</p>
+<p>Az olvasási MCP-szerver: <code>node &lt;autoX-mappa&gt;\mcp.mjs</code>. Eszközei: <code>read_summary</code>, <code>list_posts</code>, <code>list_followers</code>, <code>list_inbox</code>, <code>list_drafts</code>. Ezek kizárólag mentett adatokat olvasnak.</p>
+
+<h2>8. Mit igazolt az ellenőrzés?</h2>
+<p>A helyi tesztek az adattárolást, követőváltozásokat, analitikát, HTTP-védelmeket, tokenkezelést, sorállapotokat, időzítést és több felületi hibát vizsgálják. Az élő X-profilkérés és a teljes adatszinkron sikeres volt. Nyilvános posztot, replyt, follow/unfollow műveletet, képfeltöltést és fizetős AI-kérést az ellenőrzés nem végzett.</p>
+<p>Ez személyes használatú béta. Nincs igazolt teljes funkcióazonosság a referencia SaaS-szal, teljes történeti követőnapló, napi posztmetrika-történet, Activity stream vagy önálló AI-reply bot. A hibaellenőrzés javítja a megbízhatóságot, de nem jelent minden lehetséges helyzetre hibamentességi garanciát.</p>
+<p><a href="http://127.0.0.1:4317/">Vissza az autoX-ba →</a></p>
+</main></body></html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>autoX – User guide</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#070908;color:#eee;font:16px/1.7 system-ui,sans-serif}main{max-width:880px;margin:auto;padding:40px 24px 80px}h1{font-size:42px;line-height:1.15}h2{margin-top:44px;color:#2dff7d}h3{margin-top:28px}a{color:#2dff7d}code{background:#26232c;padding:2px 6px;border-radius:4px;overflow-wrap:anywhere}li{margin:8px 0}.notice{padding:18px 22px;border:1px solid #735331;border-radius:12px;background:#292015}table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid #39353f}small{color:#bdb6c5}nav{display:flex;flex-wrap:wrap;gap:10px 22px}@media(max-width:560px){main{padding:24px 16px}h1{font-size:32px}th,td{padding:8px;font-size:13px}}@media print{:root{color-scheme:light}body{background:white;color:black}main{padding:0}h2,a{color:#713452}.notice,code{background:#eee}nav{display:none}}
+</style>
+</head>
+<body><main>
+<small>LOCAL X WORKSPACE · BETA</small>
+<p aria-label="Guide language"><a href="guide.html" lang="hu" hreflang="hu">Magyar</a> · <a href="guide.en.html" lang="en" hreflang="en" aria-current="page">English</a></p>
+<h1>autoX<br>User guide</h1>
+<p>Launch the desktop <strong>autoX</strong> shortcut. The app runs at <a href="http://127.0.0.1:4317/">http://127.0.0.1:4317/</a>. You can also open this guide as a file without an internet connection.</p>
+<nav><a href="#start">Getting started</a><a href="#pages">Features</a><a href="#sending">Sending</a><a href="#settings">Settings</a><a href="#errors">Troubleshooting</a><a href="#data">Backup</a></nav>
+
+<h2 id="start">1. Getting started</h2>
+<ol>
+<li><strong>Launch:</strong> double-click the desktop autoX icon. If it is already running, this opens the same local app.</li>
+<li><strong>Sign in to X:</strong> Settings → Connect X account → authorize on X. Enter your password on X's own website. Your profile should appear when you return.</li>
+<li><strong>Load data:</strong> start an X sync from Overview. This makes X API requests and requires appropriate permissions and available API allowance.</li>
+<li><strong>Read the status:</strong> “Connected” indicates that an access token is present. A successful sync is a separate requirement; the app also shows sync errors.</li>
+<li><strong>AI is optional:</strong> enter and save your OpenAI API key in Settings if you want AI features. Other local features do not require an OpenAI key.</li>
+</ol>
+<div class="notice"><strong>Manual sync only.</strong> Each user supplies their own API credentials. Opening this app uses saved local data. Sync requires explicit confirmation and may make many paid API requests. Follower change tracking begins after the first complete snapshot.</div>
+
+<h2>2. One-time X sign-in setup</h2>
+<p>Once signed in, you do not need to enter these settings every time you launch the app.</p>
+<ol>
+<li>Open your application in the <a href="https://console.x.com/" target="_blank" rel="noopener noreferrer">X Developer Console</a> and enable OAuth 2.0 user authentication.</li>
+<li>The exact callback / redirect URL is <code>http://127.0.0.1:4317/oauth/callback</code>.</li>
+<li>In autoX Settings, enter your OAuth 2.0 Client ID in <strong>OAuth Client ID</strong>. If your application also has a Client Secret, enter that too.</li>
+<li>Save the connection settings, then select <strong>Connect X account</strong>.</li>
+</ol>
+<p>A Consumer Key or app-level Bearer Token does not replace this sign-in. The user Access Token field is an advanced alternative; leave it empty for normal use. Secret fields remain empty after saving: the app does not send stored keys back to the browser. Saving an empty field keeps the previous key.</p>
+<p>The app manages one X account's workspace. Do not connect another account to the same data directory. Requested permissions: <code>tweet.read tweet.write users.read follows.read follows.write media.write offline.access</code>. X determines actual endpoint access.</p>
+
+<h2 id="pages">3. Which page should you use?</h2>
+<table><thead><tr><th>Page</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Overview</td><td>Key metrics and top posts. Start an X data sync here. The top “Refresh” button only reloads data already saved locally.</td></tr>
+<tr><td>Analytics</td><td>Choose a 7-, 14- or 28-day period and sort posts by reach or engagement. “—” means data is unavailable, not zero.</td></tr>
+<tr><td>Followers</td><td>Followers, followed accounts, accounts that do not follow back, and a change log. The list is built from complete, successful syncs.</td></tr>
+<tr><td>Inbox</td><td>Available mentions and replies addressed to you. Write a draft, request an AI suggestion, and add the reply to Outbox.</td></tr>
+<tr><td>Engage</td><td>X search, language and other filters, and saved searches. Turn results into inspiration, leads or reply drafts. Every search uses API requests.</td></tr>
+<tr><td>Studio</td><td>Your own text and AI drafts. Give a specific topic, goal and tone; edit the result, then save it or add it to Outbox.</td></tr>
+<tr><td>Outbox</td><td>Save posts and replies as drafts, attach images, send manually, and approve scheduled sends. Use X's website for DM drafts.</td></tr>
+<tr><td>Patterns</td><td>Examine available posts from your own or a specified account, request an AI summary, and save it. Analysis uses the sample retrieved.</td></tr>
+<tr><td>Leads</td><td>Manually managed contacts, notes and statuses. This is not an automated customer acquisition bot.</td></tr>
+<tr><td>Settings</td><td>Language, X connection, OpenAI, writing style, goals, daily write limit, manual sync and pause controls.</td></tr>
+<tr><td>Export &amp; MCP</td><td>JSON/CSV export and a read-only MCP connection to locally saved data.</td></tr>
+</tbody></table>
+
+<h3>Understanding the follower log</h3>
+<p>The first successful complete fetch establishes a baseline. It cannot reconstruct earlier unfollows. A previous follower's disappearance must be confirmed by two consecutive complete fetches at different times. The event timestamp records when the change was detected. An incomplete or failed fetch does not prove an unfollow.</p>
+<h3>Understanding analytics</h3>
+<p>The app groups current post metrics available through the API by each post's UTC publication date. The chart does not show the day on which views occurred. Rankings cover the loaded posts and selected period; a complete account history is not guaranteed.</p>
+
+<h2 id="sending">4. Posts, replies, images and scheduling</h2>
+<ol>
+<li>In Outbox, choose a type and write your text. Replies require the target post's numeric ID: the number after <code>/status/</code> in its X link. Replies started from Inbox or Engage fill this in for you.</li>
+<li>Save as a <strong>draft</strong> first. Saving a draft does not publish a post to X.</li>
+<li>Attach images through a separate upload: up to 4 PNG/JPEG/WebP files, each up to 5 MB. Uploading is already a live X action and requires separate confirmation. An older upload's media ID may expire; upload the image again if this causes an error.</li>
+<li>Before sending manually, check the text and target, then approve the send.</li>
+<li>For scheduling, choose a future time in your computer's local time zone and approve it. Keep the computer and autoX's background process running; a sleeping computer cannot send.</li>
+</ol>
+<p><strong>When paused, live sending, follow/unfollow actions and image uploads are blocked.</strong> Resuming may also start previously approved scheduled sends that are due, so review the queue first. Manual read-only sync remains available while paused.</p>
+<p>If a scheduled send is more than 15 minutes late, the app returns it to draft for review. For an “Uncertain” status, first check X to see whether the post appeared; the app does not automatically retry. “Mark as sent” only changes local status and does not send anything.</p>
+<p>You send DMs on X's website. autoX does not read your private messages. AI-generated text is also kept as a draft for review; it is not published automatically.</p>
+
+<h2 id="settings">5. Settings and costs</h2>
+<ul>
+<li><strong>Language:</strong> choose <strong>Magyar</strong> or <strong>English</strong> under Settings → Language. The interface changes immediately and remembers your choice after a reload.</li>
+<li><strong>Manual X sync only:</strong> there is no automatic data refresh. Sync asks for separate cost confirmation. A full sync may make dozens of paginated API requests. Reloading the app and the top Refresh button only read saved local data.</li>
+<li><strong>Daily API write limit:</strong> defaults to 20 write attempts per UTC day. Posts, replies, image uploads and follow/unfollow actions count; failed attempts may also consume the allowance. This is not a financial spending cap and does not limit reads.</li>
+<li><strong>Reach goal:</strong> a displayed target only, not an instruction to post automatically.</li>
+<li><strong>OpenAI:</strong> requires your own API key and an accessible model. The default model is <code>gpt-4.1-mini</code>. A ChatGPT subscription alone does not replace an API key or API allowance.</li>
+<li><strong>Automation:</strong> controls only approved scheduled sends. No autonomous AI reply bot or automatic follow/unfollow is enabled.</li>
+</ul>
+
+<h2 id="errors">6. Troubleshooting</h2>
+<table><thead><tr><th>Error</th><th>What to do</th></tr></thead><tbody>
+<tr><td>HTTP 402 / API credits</td><td>Check the API balance, billing and spending limits for your project in the X Developer Console. An X Premium subscription does not establish that API credits are available. Sign-in may still work. After resolving the allowance, start a manual sync.</td></tr>
+<tr><td>HTTP 401</td><td>The token is invalid or expired. Try connecting your X account again. Check the OAuth application's settings if needed.</td></tr>
+<tr><td>HTTP 403</td><td>A permission or endpoint access restriction may be blocking the request. Check your X application's permissions; changes may require signing in again.</td></tr>
+<tr><td>HTTP 429</td><td>Wait for the API limit to reset. Avoid starting repeated syncs in quick succession.</td></tr>
+<tr><td>Invalid or expired X sign-in</td><td>Start again using autoX's button. Do not bookmark an earlier authorization link: it contains short-lived state.</td></tr>
+<tr><td>Different X account</td><td>Sign in again with the original account. Another account requires a separate local data directory; the app does not mix data from two accounts.</td></tr>
+<tr><td>Empty analytics or follower list</td><td>Check whether that part of the sync succeeded. An empty local list after a failed sync does not prove that you have no posts or followers.</td></tr>
+<tr><td>“Refresh the page to perform this action”</td><td>The server restarted and the browser has an old session. Reload the page. Copy any unsaved text first.</td></tr>
+<tr><td>The app does not start</td><td>Launch the desktop autoX shortcut. Node.js 24 or later is required. Logs are in the data folder below.</td></tr>
+</tbody></table>
+
+<h2 id="data">7. Backup, privacy and shutdown</h2>
+<p>Data folder: <code>%LOCALAPPDATA%\Xauto</code>. <code>workspace.sqlite</code> stores the workspace; <code>credentials.dpapi</code> is the encrypted key store tied to your Windows user. Logs: <code>server.log</code> and <code>server-error.log</code>. Keep secret keys out of screenshots, chats and public shares.</p>
+<p>For backup, use <strong>Export &amp; MCP → JSON export</strong>. CSV exports post data. Exports do not contain connection keys. Automatic JSON import is not available in the beta. For a full file backup, stop the app and copy the entire data folder; the encrypted key store may not be readable by another Windows user.</p>
+<p>Closing the browser does not stop the server. Pause stops subsequent automatic actions; a request already started cannot be recalled. Shutting down the computer stops the app. In Task Manager, stop only the Node process belonging to autoX, not other Node apps.</p>
+<p>Local data stays on your computer. X sync, sending and search communicate with the X API; AI requests send the selected context to the OpenAI API. The app listens only on the local address <code>127.0.0.1</code>.</p>
+<p>Read-only MCP server: <code>node &lt;autoX-folder&gt;\mcp.mjs</code>. Tools: <code>read_summary</code>, <code>list_posts</code>, <code>list_followers</code>, <code>list_inbox</code>, <code>list_drafts</code>. These read saved data only.</p>
+
+<h2>8. What did verification establish?</h2>
+<p>Local tests cover data storage, follower changes, analytics, HTTP protections, token handling, queue states, scheduling and several interface errors. The live X profile request and full data sync succeeded. Verification did not publish posts or replies, perform follow/unfollow actions, upload images or make paid AI requests.</p>
+<p>This is a beta for personal use. Full feature parity with the reference SaaS, a complete historical follower log, daily post metric history, an Activity stream and an autonomous AI reply bot have not been verified. Error checks improve reliability but do not guarantee error-free operation in every possible situation.</p>
+<p><a href="http://127.0.0.1:4317/">Back to autoX →</a></p>
+</main></body></html>
