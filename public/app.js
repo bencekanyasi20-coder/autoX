@@ -21,7 +21,7 @@ function button(label, action, data = '', className = '') { return `<button type
 function draftKey(control, page) {
   if (control.id==='ui-language' || ['password','file'].includes(control.type) || ['xClientSecret','xAccessToken','openaiKey'].includes(control.name)) return null;
   const inbox=control.closest('[data-inbox]'), lead=control.closest('[data-lead]'), post=control.closest('[data-post]'), form=control.closest('form');
-  const group=inbox ? `inbox:${inbox.dataset.inbox}` : lead ? `lead:${lead.dataset.lead}` : post ? `post:${post.dataset.post}` : form?.id ? `form:${form.id}` : 'page';
+  const group=inbox ? `inbox:${inbox.dataset.inbox}` : lead ? `lead:${lead.dataset.lead}` : post ? `post:${post.dataset.post}` : form?.getAttribute('id') ? `form:${form.getAttribute('id')}` : 'page';
   const field=control.name || control.id || (control.hasAttribute('data-draft')?'draft':control.hasAttribute('data-reply')?'reply':control.hasAttribute('data-lead-notes')?'notes':control.hasAttribute('data-lead-status')?'status':'');
   return field ? `${page}|${group}|${field}` : null;
 }
@@ -149,7 +149,7 @@ function collectionCards(collection, title, textKey='text') {
     ${i.postId?html`<a class="link" href="${postURL(i.postId)}" target="_blank" rel="noopener noreferrer" style="font-size:10px">Eredeti bejegyzés ↗</a>`:''}
     ${['library','sessions'].includes(collection)?`<div class="form-actions">${button(t('Szerkesztés a Studioban'),'load-material',`data-collection="${collection}" data-id="${esc(i.id)}"`,'small')}</div>`:''}</article>`).join('')}</div>`:empty(t('A könyvtárad még üres'),t('Ments inspirációt az Engage találatai közül, vagy adj hozzá saját anyagot.')));
 }
-function renderStudio() { return heading(t('Az ötlettől a következő posztig.'),t('Írj, finomíts és tervezz a saját hangodon.'),badge(config.openaiConfigured?t('OpenAI csatlakoztatva'):t('AI-kulcs nincs beállítva'),config.openaiConfigured?'green':''))+`<div class="grid">${panel(t('Íróasztal'),html`<form id="studio-form" class="stack"><label>Mit szeretnél megírni?<textarea name="prompt" required placeholder="Egy rövid bejegyzés arról, amit ma tanultam a terméképítésről…"></textarea></label><div class="form-grid"><label>Formátum<select name="mode"><option value="post">Bejegyzés</option><option value="reply">Válasz</option><option value="rewrite">Átírás</option><option value="ideas">Ötletek</option></select></label><label>Termékkontextus<select name="product"><option value="">Nincs kiválasztva</option>${state.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name||t('Termék'))}</option>`).join('')}</select></label></div><button type="submit" class="primary">✦ Tervezet készítése</button></form><div class="divider"></div><label>Szerkeszthető tervezet<textarea id="studio-draft" placeholder="Írj ide saját szöveget, vagy készíts AI-tervezetet…" style="min-height:190px"></textarea></label><div class="form-actions">${button(t('Küldési sorba →'),'studio-queue','','primary')}${button(t('Mentés inspirációként'),'studio-save')}${button(t('Másolás'),'copy','data-source="studio-draft"','quiet small')}<small id="studio-count">0 karakter</small></div>`)}<div>${panel(t('A te hangod'),html`<p class="secondary-text">${esc(state.settings.style||t('Még nincs megadva stílusleírás. Írd le, hogyan fogalmazol, kinek írsz és mit szeretnél kerülni.'))}</p><div class="form-actions"><button data-nav="settings" class="small">Stílus beállítása ↗</button></div><div class="callout"><strong>A kontextus számít.</strong>A saját stílusod, a mentett inspirációk és a kiválasztott termék segítik a tervezetet. Küldés előtt mindig átnézheted.</div>`)}${panel(t('Termék vagy szolgáltatás'),html`<form id="product-form" class="stack"><label>Név<input name="name" required placeholder="A terméked neve"></label><label>Mit kínálsz, és kinek?<textarea name="description" required placeholder="Probléma, megoldás, célközönség, hivatkozás…"></textarea></label><button type="submit">Termék mentése</button></form>`)}</div></div><div class="grid equal">${collectionCards('library',t('Inspirációs könyvtár'))}${collectionCards('products',t('Mentett termékek'),'description')}</div>`+collectionCards('sessions',t('Mentett írói munkamenetek és kérdéscsoportok')); }
+function renderStudio() { return heading(t('Az ötlettől a következő posztig.'),t('Írj, finomíts és tervezz a saját hangodon.'),badge(config.openaiConfigured?t('OpenAI csatlakoztatva'):t('AI-kulcs nincs beállítva'),config.openaiConfigured?'green':''))+`<div class="grid">${panel(t('Íróasztal'),html`<form id="studio-form" class="stack"><label>Mit szeretnél megírni?<textarea name="prompt" required placeholder="Egy rövid bejegyzés arról, amit ma tanultam a terméképítésről…"></textarea></label><div class="form-grid"><label>Formátum<select name="mode"><option value="post">Bejegyzés</option><option value="reply">Válasz</option><option value="rewrite">Átírás</option><option value="ideas">Ötletek</option></select></label><label>Termékkontextus<select name="product"><option value="">Nincs kiválasztva</option>${state.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name||t('Termék'))}</option>`).join('')}</select></label></div><button type="submit" class="primary">✦ Tervezet készítése</button></form><div class="divider"></div><label>Szerkeszthető tervezet<textarea id="studio-draft" placeholder="Írj ide saját szöveget, vagy készíts AI-tervezetet…" style="min-height:190px"></textarea></label><div class="form-actions">${button(t('Közzététel most'),'studio-publish','','primary')}${button(t('Küldési sorba →'),'studio-queue')}${button(t('Mentés inspirációként'),'studio-save')}${button(t('Másolás'),'copy','data-source="studio-draft"','quiet small')}<small id="studio-count">0 karakter</small></div>`)}<div>${panel(t('A te hangod'),html`<p class="secondary-text">${esc(state.settings.style||t('Még nincs megadva stílusleírás. Írd le, hogyan fogalmazol, kinek írsz és mit szeretnél kerülni.'))}</p><div class="form-actions"><button data-nav="settings" class="small">Stílus beállítása ↗</button></div><div class="callout"><strong>A kontextus számít.</strong>A saját stílusod, a mentett inspirációk és a kiválasztott termék segítik a tervezetet. Küldés előtt mindig átnézheted.</div>`)}${panel(t('Termék vagy szolgáltatás'),html`<form id="product-form" class="stack"><label>Név<input name="name" required placeholder="A terméked neve"></label><label>Mit kínálsz, és kinek?<textarea name="description" required placeholder="Probléma, megoldás, célközönség, hivatkozás…"></textarea></label><button type="submit">Termék mentése</button></form>`)}</div></div><div class="grid equal">${collectionCards('library',t('Inspirációs könyvtár'))}${collectionCards('products',t('Mentett termékek'),'description')}</div>`+collectionCards('sessions',t('Mentett írói munkamenetek és kérdéscsoportok')); }
 function composeForm() {
   return html`<form id="queue-form"><input type="hidden" name="id"><div class="form-grid">
     <label>Típus<select name="kind" id="queue-kind"><option value="post">Új bejegyzés</option><option value="reply">Válasz</option><option value="dm">Privát üzenet · kézi küldés</option></select></label>
@@ -158,7 +158,7 @@ function composeForm() {
     <label>Időzítés (opcionális)<input name="scheduledAt" type="datetime-local"><small>A helyi gépnek és az alkalmazásnak futnia kell.</small></label>
     <label>Feltöltött médiaazonosítók<input name="mediaIds" placeholder="Opcionális X média ID, vesszővel elválasztva"><small>Legfeljebb 4 kép; DM-nél kézzel csatold az X-en.</small></label>
     <div class="wide"><label>Kép csatolása<input id="queue-image" type="file" accept="image/png,image/jpeg,image/webp"></label><div class="form-actions">${button(t('Kép feltöltése az X-re'),'upload-image','','small')}<small id="upload-status">PNG, JPEG vagy WebP · legfeljebb 5 MB</small></div></div>
-    </div><div class="form-actions"><button class="primary" type="submit">Mentés a sorba</button>${button(t('Új tervezet'),'reset-composer','','quiet')}<small id="composer-note">Piszkozatot mentünk. Időzítéshez külön jóváhagyást kérünk.</small></div></form>`;
+    </div><div class="form-actions"><button class="primary" type="submit" name="intent" value="publish">Közzététel most</button><button type="submit" name="intent" value="save">Mentés a sorba</button>${button(t('Új tervezet'),'reset-composer','','quiet')}<small id="composer-note">Közzététel most: azonnali küldés megerősítéssel. Mentés a sorba: piszkozat vagy időzítés.</small></div></form>`;
 }
 function manualURL(item) { if(item.kind==='dm') return `https://x.com/messages/compose${/^\d+$/.test(item.targetId||'')?'?recipient_id='+encodeURIComponent(item.targetId):''}`; return `https://x.com/intent/tweet?text=${encodeURIComponent(item.text||'')}${item.kind==='reply'?'&in_reply_to='+encodeURIComponent(item.targetId||''):''}`; }
 function queueCard(item) {
@@ -183,6 +183,31 @@ function renderExports() { return heading(t('Adataid, szabadon.'),t('Helyi expor
 
 async function ai(prompt, context = {}, mode = 'post') { if(!config.openaiConfigured) throw new Error(t('Előbb add meg az OpenAI API-kulcsot a Beállításokban.')); if(!confirm(t('AI-javaslat készítése az OpenAI API-val? Ez a saját API-fiókodban költséget jelenthet.'))) return null; return (await api('/api/ai',{prompt,context,mode})).text; }
 function getPost(id) { return [...(searchResults?.posts||[]),...(analyzed?.posts||[]),...state.posts].find(p=>String(p.id)===String(id)); }
+let publishingNow = false;
+async function publishNow(item, clearGroup) {
+  if(publishingNow)return;
+  if(!item.text?.trim())throw new Error(t('Írj szöveget a tervezetbe.'));
+  if(item.kind==='dm')throw new Error(t('A privát üzenetet az X-en nyisd meg és küldd el.'));
+  if(state.demo || !state.account || !config.xConnected)throw new Error(t('Élő közzétételhez csatlakoztasd a saját X-fiókodat.'));
+  if(config.paused)throw new Error(t('A küldés szünetel. A Beállításokban indíthatod újra.'));
+  if(!confirm(t('Most közzéteszed az X-en? Ez élő, fizetős API-művelet lehet.')+'\n\n@'+state.account.username+'\n\n'+item.text))return;
+  const originPage=currentPage;
+  captureDrafts();
+  const prefix=`${originPage}|${clearGroup}|`;
+  const submittedDrafts=[...inputDrafts].filter(([key])=>key.startsWith(prefix));
+  publishingNow=true;
+  try {
+    const saved=await api('/api/queue',{item:{...item,status:'draft',scheduledAt:null}});
+    captureDrafts();
+    if(submittedDrafts.every(([key,value])=>inputDrafts.get(key)===value))clearDraftGroup(clearGroup,originPage);
+    await mutate('/api/queue/action',{id:saved.id,action:'send'},t('Küldési művelet feldolgozva. Ellenőrizd az elem állapotát.'));
+    navigate('queue');
+  } catch(error) {
+    try { await refresh(); } catch { /* Keep the original delivery error. */ }
+    navigate('queue');
+    throw error;
+  } finally { publishingNow=false; }
+}
 async function addQueue(text, kind='post', targetId='', username='') { if(!text.trim()) throw new Error(t('Írj szöveget a tervezetbe.')); await mutate('/api/queue',{item:{kind,text,targetId,username,status:'draft'}},t('Tervezet mentve a küldési sorba.')); }
 async function collection(collectionName, item, clearGroup = '') { return mutate('/api/collection',{collection:collectionName,item},t('Mentve a helyi munkatérben.'),clearGroup); }
 function formValues(form) { return Object.fromEntries(new FormData(form)); }
@@ -236,6 +261,7 @@ async function handleAction(el) {
     const base64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(new Error(t('A képfájl nem olvasható.')));reader.readAsDataURL(file);});
     try{const result=await api('/api/media',{base64,mimeType:file.type});if(!result.mediaId)throw new Error(t('A feltöltés nem adott médiaazonosítót.'));form.elements.mediaIds.value=[...ids,result.mediaId].join(',');$('#upload-status').textContent=html`Feltöltve: ${file.name}`;toast(t('Kép csatolva a tervezethez.'));}catch(error){$('#upload-status').textContent=t('A feltöltés sikertelen. Válassz képet és próbáld újra.');throw error;}
   }
+  else if(action==='studio-publish'){await publishNow({kind:'post',text:$('#studio-draft').value},'page');}
   else if(action==='studio-queue'){await addQueue($('#studio-draft').value);}
   else if(action==='studio-save'){const text=$('#studio-draft').value;if(!text.trim())throw new Error(t('A tervezet még üres.'));await collection('library',{title:t('Saját tervezet'),text});}
   else if(action==='load-material'){
@@ -264,25 +290,27 @@ async function performSearch(form) {
   searchResults={...result,query,posts:(result.posts||[]).filter(p=>!v.hideReplied||!replied.has(String(p.id)))};
   render();const f=$('#search-form');if(!f)return;for(const k of ['query','language','age'])f.elements[k].value=v[k]||'';for(const k of ['excludeReplies','hideReplied'])f.elements[k].checked=!!v[k];
 }
-async function handleSubmit(form) {
+async function handleSubmit(form, intent = 'save') {
   const v=formValues(form), originPage=currentPage, studioDraft=$('#studio-draft');
-  if(form.id==='search-form')await performSearch(form);
-  else if(form.id==='studio-form'){const product=state.products.find(p=>String(p.id)===v.product),text=await ai(v.prompt,{product,style:state.settings.style,library:state.library.slice(-15),posts:state.posts.slice(0,15)},v.mode);if(text!=null)setDraftValue(studioDraft,text,originPage,'studio|page|studio-draft');}
-  else if(form.id==='product-form')await collection('products',v,`form:${form.id}`);
-  else if(form.id==='lead-form')await collection('leads',{...v,username:v.username.replace(/^@/,''),status:'new'},`form:${form.id}`);
-  else if(form.id==='analyze-form'){analyzed=await api('/api/analyze',{username:v.username.replace(/^@/,'')});render();}
-  else if(form.id==='queue-form'){
+  if(form.getAttribute('id')==='search-form')await performSearch(form);
+  else if(form.getAttribute('id')==='studio-form'){const product=state.products.find(p=>String(p.id)===v.product),text=await ai(v.prompt,{product,style:state.settings.style,library:state.library.slice(-15),posts:state.posts.slice(0,15)},v.mode);if(text!=null)setDraftValue(studioDraft,text,originPage,'studio|page|studio-draft');}
+  else if(form.getAttribute('id')==='product-form')await collection('products',v,`form:${form.getAttribute('id')}`);
+  else if(form.getAttribute('id')==='lead-form')await collection('leads',{...v,username:v.username.replace(/^@/,''),status:'new'},`form:${form.getAttribute('id')}`);
+  else if(form.getAttribute('id')==='analyze-form'){analyzed=await api('/api/analyze',{username:v.username.replace(/^@/,'')});render();}
+  else if(form.getAttribute('id')==='queue-form'){
     const scheduledAt=v.scheduledAt?new Date(v.scheduledAt).toISOString():null;
+    if(intent==='publish'&&scheduledAt)throw new Error(t('Azonnali közzétételhez töröld az időzítést.'));
     if(scheduledAt&&v.kind==='dm')throw new Error(t('A DM kézi küldésű, ezért nem időzíthető.'));
     if(scheduledAt&&new Date(scheduledAt)<=new Date())throw new Error(t('Válassz jövőbeli időpontot.'));
     if(v.kind==='reply'&&!/^\d+$/.test(v.target.trim()))throw new Error(t('A válaszhoz számból álló X-bejegyzésazonosító szükséges.'));
     if(v.kind==='dm'&&!v.target.trim())throw new Error(t('Add meg a DM címzettjét.'));
+    if(intent==='publish'){await publishNow({...(v.id?{id:v.id}:{}),kind:v.kind,text:v.text,targetId:v.kind==='reply'?v.target.trim():'',mediaIds:v.mediaIds.split(',').map(s=>s.trim()).filter(Boolean)},`form:${form.getAttribute('id')}`);return;}
     if(scheduledAt&&!confirm(html`Jóváhagyod az automatikus élő X-küldést ekkor: ${date(scheduledAt)}? A programnak futnia kell.`))return;
-    await mutate('/api/queue',{item:{...(v.id?{id:v.id}:{}),kind:v.kind,text:v.text,targetId:v.kind==='reply'||/^\d+$/.test(v.target)?v.target.trim():'',username:v.kind==='dm'?v.target.replace(/^@/,''):'',status:scheduledAt?'scheduled':'draft',scheduledAt,mediaIds:v.mediaIds.split(',').map(s=>s.trim()).filter(Boolean)}},scheduledAt?t('Jóváhagyott időzítés elmentve.'):t('Piszkozat elmentve.'),`form:${form.id}`);
+    await mutate('/api/queue',{item:{...(v.id?{id:v.id}:{}),kind:v.kind,text:v.text,targetId:v.kind==='reply'||/^\d+$/.test(v.target)?v.target.trim():'',username:v.kind==='dm'?v.target.replace(/^@/,''):'',status:scheduledAt?'scheduled':'draft',scheduledAt,mediaIds:v.mediaIds.split(',').map(s=>s.trim()).filter(Boolean)}},scheduledAt?t('Jóváhagyott időzítés elmentve.'):t('Piszkozat elmentve.'),`form:${form.getAttribute('id')}`);
   }
-  else if(['x-settings-form','ai-settings-form','general-settings-form'].includes(form.id)){
-    if(form.id==='general-settings-form'){for(const key of ['goal','dailyWriteLimit'])v[key]=Number(v[key]);}
-    await mutate('/api/settings',v,t('Beállítások elmentve.'),`form:${form.id}`);
+  else if(['x-settings-form','ai-settings-form','general-settings-form'].includes(form.getAttribute('id'))){
+    if(form.getAttribute('id')==='general-settings-form'){for(const key of ['goal','dailyWriteLimit'])v[key]=Number(v[key]);}
+    await mutate('/api/settings',v,t('Beállítások elmentve.'),`form:${form.getAttribute('id')}`);
   }
 }
 document.addEventListener('click',async e=>{
@@ -291,7 +319,7 @@ document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-action]');if(!el||el.disabled)return;
   el.disabled=true;try{await handleAction(el);}catch(error){toast(error.message,true);}finally{if(el.isConnected)el.disabled=false;}
 });
-document.addEventListener('submit',async e=>{if(!e.target.matches('form'))return;e.preventDefault();const form=e.target,submit=$('[type="submit"]',form);if(submit)submit.disabled=true;try{await handleSubmit(form);}catch(error){toast(error.message,true);}finally{if(submit?.isConnected)submit.disabled=false;}});
+document.addEventListener('submit',async e=>{if(!e.target.matches('form'))return;e.preventDefault();const form=e.target,submit=e.submitter;if(submit)submit.disabled=true;try{await handleSubmit(form,submit?.value||'save');}catch(error){toast(error.message,true);}finally{if(submit?.isConnected)submit.disabled=false;}});
 function filterFollowers(value) { const query=value.toLocaleLowerCase('hu');$$('.filterable').forEach(row=>{row.hidden=!row.dataset.filter.toLocaleLowerCase('hu').includes(query);}); }
 document.addEventListener('input',e=>{if(e.target.id==='follower-filter')filterFollowers(e.target.value);if(e.target.id==='studio-draft')$('#studio-count').textContent=html`${e.target.value.length} karakter`;});
 document.addEventListener('change',async e=>{if(e.target.id==='ui-language'){const selected=e.target.value;e.target.disabled=true;captureDrafts();try{await api('/api/settings',{language:selected});state.settings.language=selected;window.XautoI18n.setLanguage(selected);render();toast(t('Beállítások elmentve.'));}catch(error){e.target.value=window.XautoI18n.language;toast(error.message,true);}finally{if(e.target.isConnected)e.target.disabled=false;}return;}if(e.target.id==='post-sort'){sortBy=e.target.value;render();}});

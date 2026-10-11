@@ -186,7 +186,7 @@ export async function startApp(options = {}) {
       const url = new URL(req.url, baseUrl);
       const path = url.pathname;
       if (req.method === 'GET') {
-        if (path === '/health') return json({ app: 'xauto', version: '0.1.0' });
+        if (path === '/health') return json({ app: 'xauto', version: '0.1.1' });
         if (path === '/api/state') return json({ state: store.get(), analytics: computeAnalytics(store.get(), [7,14,28].includes(Number(url.searchParams.get('days'))) ? Number(url.searchParams.get('days')) : 28), config: await getConfig(), csrf, runtime: { syncing, sending, backgroundError } });
         if (path === '/api/export') {
           const state = store.get();

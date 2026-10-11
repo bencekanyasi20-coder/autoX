@@ -3,6 +3,11 @@
 // are joined afterwards by html(), so saved content is never translated.
 (() => {
   const pairs = `
+Közzététel most: azonnali küldés megerősítéssel. Mentés a sorba: piszkozat vagy időzítés.|Publish now: immediate sending after confirmation. Save to queue: draft or scheduled post.
+Közzététel most|Publish now
+Élő közzétételhez csatlakoztasd a saját X-fiókodat.|Connect your own X account before publishing.
+Most közzéteszed az X-en? Ez élő, fizetős API-művelet lehet.|Publish on X now? This is a live API action and may incur charges.
+Azonnali közzétételhez töröld az időzítést.|Clear the scheduled time to publish now.
 Az első 100 találat látható. Nincs automatikus továbblapozás; szűkítsd a keresést a további API-költségek korlátozásához.|Showing the first 100 results. No automatic pagination; narrow your search to limit further API costs.
 Lekéred az X aktuális adatait? Ez fizetős API-kéréseket indíthat. Egy teljes szinkron több tucat lapozott kérést is jelenthet.|Fetch current data from X? This may incur API charges. One full sync may make dozens of paginated requests.
 X-adatok frissítése: kizárólag kézzel, külön jóváhagyással. Az oldal megnyitása és a felső Frissítés gomb csak helyi adatokat olvas.|X data sync: manual only, with separate confirmation. Opening the app and the top Refresh button only read saved local data.

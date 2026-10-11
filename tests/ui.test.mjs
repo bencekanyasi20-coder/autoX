@@ -16,6 +16,79 @@ test('Engage reply drafts have stable distinct cache keys', () => {
 
 function extract(start, end) { return source.slice(source.indexOf(start), source.indexOf(end)); }
 
+test('composer dispatch works when hidden id field shadows the form id property',async()=>{
+  const calls=[];
+  const run=vm.runInNewContext(extract('async function handleSubmit(', "document.addEventListener('click'")+';handleSubmit',{
+    formValues:()=>({id:'',kind:'post',text:'Fixture',target:'',scheduledAt:'',mediaIds:''}),
+    currentPage:'queue',$:()=>null,t:x=>x,publishNow:async(...args)=>calls.push(args)
+  });
+  const form={id:{value:''},getAttribute:name=>name==='id'?'queue-form':null};
+  await run(form,'publish');
+  assert.equal(calls.length,1);
+  assert.equal(calls[0][0].text,'Fixture');
+  assert.equal(calls[0][1],'form:queue-form');
+});
+
+function publishFixture(overrides={}) {
+  const calls=[];
+  const context={state:{account:{username:'fixture'}},config:{xConnected:true,paused:false},currentPage:'studio',
+    captureDrafts:()=>{},inputDrafts:new Map(),
+    t:x=>x,confirm:()=>true,api:async(path,body)=>{calls.push({path,body});return{id:'saved-draft'};},
+    mutate:async(path,body)=>{calls.push({path,body});},clearDraftGroup:(...args)=>calls.push({clear:args}),
+    refresh:async()=>{},navigate:page=>calls.push({navigate:page}),...overrides};
+  const run=vm.runInNewContext(extract('let publishingNow =', 'async function addQueue(')+';publishNow',context);
+  return{run,calls};
+}
+
+test('publish now creates a tracked draft and sends the returned ID exactly once',async()=>{
+  const {run,calls}=publishFixture();
+  await run({kind:'post',text:'Fixture text',mediaIds:['123']},'page');
+  assert.equal(calls[0].path,'/api/queue');
+  assert.equal(calls[0].body.item.status,'draft');
+  assert.equal(calls[0].body.item.scheduledAt,null);
+  assert.equal(calls[0].body.item.mediaIds[0],'123');
+  assert.deepEqual(Array.from(calls[1].clear),['page','studio']);
+  assert.equal(calls[2].path,'/api/queue/action');
+  assert.equal(calls[2].body.id,'saved-draft');
+  assert.equal(calls[2].body.action,'send');
+  assert.equal(calls[3].navigate,'queue');
+});
+
+test('publish now cancellation and blocked states make no API requests',async()=>{
+  const cancelled=publishFixture({confirm:()=>false});
+  await cancelled.run({kind:'post',text:'Fixture'},'page');
+  assert.equal(cancelled.calls.length,0);
+  for(const overrides of [{config:{paused:true,xConnected:true}},{state:{demo:true}},{config:{xConnected:false}}]){
+    const f=publishFixture(overrides);
+    await assert.rejects(f.run({kind:'post',text:'Fixture'},'page'));
+    assert.equal(f.calls.length,0);
+  }
+  const dm=publishFixture();await assert.rejects(dm.run({kind:'dm',text:'Fixture'},'page'));assert.equal(dm.calls.length,0);
+});
+
+test('publish now suppresses double clicks and retains uncertain outcome in the queue without retry',async()=>{
+  let release,calls=0;
+  const f=publishFixture({mutate:()=>{calls++;return new Promise((resolve,reject)=>{release=()=>reject(new Error('Uncertain'));});}});
+  const first=f.run({kind:'post',text:'Fixture'},'page');
+  await Promise.resolve();
+  await f.run({kind:'post',text:'Fixture'},'page');
+  release();await assert.rejects(first,/Uncertain/);
+  assert.equal(calls,1);
+  assert.equal(f.calls.filter(c=>c.path==='/api/queue').length,1);
+  assert.equal(f.calls.at(-1).navigate,'queue');
+});
+
+test('publish now preserves new edits typed while the draft save is pending',async()=>{
+  const drafts=new Map([['studio|page|studio-draft','Submitted text']]);
+  let complete;
+  const f=publishFixture({inputDrafts:drafts,api:()=>new Promise(resolve=>{complete=()=>resolve({id:'saved'});})});
+  const pending=f.run({kind:'post',text:'Submitted text'},'page');
+  drafts.set('studio|page|studio-draft','My next idea');
+  complete();await pending;
+  assert.equal(drafts.get('studio|page|studio-draft'),'My next idea');
+  assert.equal(f.calls.some(c=>c.clear),false);
+});
+
 test('X sync requires user cost confirmation before making a request', async () => {
   const calls=[];
   let approved=false;

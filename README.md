@@ -43,6 +43,7 @@ Enter the OAuth 2.0 Client ID, not the OAuth 1.0 Consumer Key. An app-only Beare
 - Inbox for mentions/replies; drafts, manual reply sending and scheduling.
 - Engage search with language and 1/3/7-day filters.
 - AI writing assistance, inspiration library, public account analysis and leads.
+- Publish now directly from New post or Studio, with account/text confirmation.
 - Image attachments, a local queue and explicit delivery states.
 - CSV/JSON export and a read-only local MCP server.
 - English/Hungarian UI with a Drevin green/black theme.
